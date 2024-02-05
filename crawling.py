@@ -22,6 +22,7 @@ options.add_argument("lang=ko_KR")
 service = ChromeService(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 review_driver = webdriver.Chrome(service=service, options=options)
+re_compile = re.compile('[^가-힣]')
 
 for i in range(1, 51):
     print('page ', i)
@@ -64,7 +65,7 @@ for i in range(1, 51):
                     for i in range(3, 13):
                         reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
                         for review_cont in reviews:
-                            review = review + ' ' + review_cont.text
+                            review = review + ' ' + re_compile.sub(' ',review_cont.text)
                         review_driver.find_element(By.XPATH, f'//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a[{i}]').click()
                         time.sleep(0.3)
                 reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
