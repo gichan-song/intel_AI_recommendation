@@ -27,6 +27,10 @@ re_compile = re.compile('[^가-힣]')
 for i in range(1, 51):
     print('page ', i)
     try:
+        #
+        #
+        #
+        # 카테고리만 변경하시면 됩니다 현재 테마소설 진행중
         driver.get(f'https://www.yes24.com/24/Category/Display/001001046012?PageNumber={i}')
         titles = driver.find_elements(By.CLASS_NAME, 'goods_name')
         urls = []
@@ -43,6 +47,7 @@ for i in range(1, 51):
                 author = driver.find_element(By.CSS_SELECTOR, '.gd_auth a').text
                 image_path = driver.find_element(By.CLASS_NAME, 'gImg').get_attribute('src')
                 review = ''
+                print(title)
                 print(image_path)
             except:
                 print(sys.exc_info()[0])
@@ -70,20 +75,19 @@ for i in range(1, 51):
                         time.sleep(0.3)
                 reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
                 for review_cont in reviews:
-                    review = review + ' ' + review_cont.text
+                    review = review + ' ' + re_compile.sub(' ',review_cont.text)
                 for i in range(3, int(max_page) % 10 + 2):
                     review_driver.find_element(By.XPATH,
                                                f'//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a[{i}]').click()
                     reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
                     for review_cont in reviews:
-                        review = review + ' ' + review_cont.text
+                        review = review + ' ' + re_compile.sub(' ',review_cont.text)
                     time.sleep(0.3)
 
             except NoSuchElementException:
                 review = ''
             except:
                 print(sys.exc_info()[0])
-            print(title)
             book = pd.DataFrame([{'title': title, 'sub_category': sub_category, 'author': author, 'image_path': image_path,
                                    'review': review}])
             book.to_csv(f'./books/{title}.csv', index=False)
