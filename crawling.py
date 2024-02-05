@@ -23,9 +23,10 @@ service = ChromeService(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
 review_driver = webdriver.Chrome(service=service, options=options)
 
-for i in range(1, 201):
+for i in range(1, 51):
+    print('page ', i)
     try:
-        driver.get(f'https://www.yes24.com/24/Category/Display/001001046011?PageNumber={i}')
+        driver.get(f'https://www.yes24.com/24/Category/Display/001001046012?PageNumber={i}')
         titles = driver.find_elements(By.CLASS_NAME, 'goods_name')
         urls = []
         for title in titles:
@@ -35,26 +36,29 @@ for i in range(1, 201):
         for url in urls:
             try:
                 driver.get(url)
-                time.sleep(1)
+                time.sleep(0.3)
                 title = driver.find_element(By.XPATH, '//*[@id="yDetailTopWrap"]/div[2]/div[1]/div/h2').text
-                category = driver.find_element(By.XPATH, '//*[@id="yLocation"]/div/div[3]/a').text
+                sub_category = driver.find_element(By.XPATH, '//*[@id="yLocation"]/div/div[4]/a').text
+                author = driver.find_element(By.CSS_SELECTOR, '.gd_auth a').text
+                image_path = driver.find_element(By.CLASS_NAME, 'gImg').get_attribute('src')
                 review = ''
+                print(image_path)
             except:
                 print(sys.exc_info()[0])
             try:
                 driver.find_element(By.XPATH, '//*[@id="yDetailTabNavWrap"]/div/div[2]/ul/li[2]/a').click()
-                time.sleep(1)
+                time.sleep(0.3)
                 driver.find_element(By.XPATH, '//*[@id="total"]/a').click()
-                time.sleep(1)
+                time.sleep(0.3)
                 reviews = driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[7]/div[1]/div/a')[-1]\
                     .get_attribute('href')
                 max_page = reviews.split('PageNumber=')[1].split('&')[0]
                 print(max_page)
-                time.sleep(1)
+                time.sleep(0.3)
                 review_driver.get(reviews)
                 review_pages = review_driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a')
                 review_pages[0].click()
-                time.sleep(1)
+                time.sleep(0.3)
                 review_pages = review_driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a')
                 for ten_pages in range(int(max_page) // 10):
                     for i in range(3, 13):
@@ -62,7 +66,7 @@ for i in range(1, 201):
                         for review_cont in reviews:
                             review = review + ' ' + review_cont.text
                         review_driver.find_element(By.XPATH, f'//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a[{i}]').click()
-                        time.sleep(1)
+                        time.sleep(0.3)
                 reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
                 for review_cont in reviews:
                     review = review + ' ' + review_cont.text
@@ -72,14 +76,15 @@ for i in range(1, 201):
                     reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
                     for review_cont in reviews:
                         review = review + ' ' + review_cont.text
-                    time.sleep(1)
+                    time.sleep(0.3)
 
             except NoSuchElementException:
                 review = ''
             except:
                 print(sys.exc_info()[0])
             print(title)
-            book = pd.DataFrame([{'title': title, 'category': category, 'review': review}])
+            book = pd.DataFrame([{'title': title, 'sub_category': sub_category, 'author': author, 'image_path': image_path,
+                                   'review': review}])
             book.to_csv(f'./books/{title}.csv', index=False)
             # book = pd.DataFrame()
     except:
