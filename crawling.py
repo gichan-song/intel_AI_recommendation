@@ -32,7 +32,6 @@ for i in range(1, 201):
             urls.append(title.find_element(By.TAG_NAME, 'a').get_attribute('href'))
         print(urls)
 
-        df = pd.DataFrame(columns=['title', 'category', 'review', 'author'])
         for url in urls:
             try:
                 driver.get(url)
