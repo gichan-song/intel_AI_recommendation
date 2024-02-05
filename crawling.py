@@ -21,6 +21,7 @@ options.add_argument("lang=ko_KR")
 
 service = ChromeService(executable_path=ChromeDriverManager().install())
 driver = webdriver.Chrome(service=service, options=options)
+review_driver = webdriver.Chrome(service=service, options=options)
 
 driver.get('https://www.yes24.com/24/Category/Display/001001046011')
 titles = driver.find_elements(By.CLASS_NAME, 'goods_name')
@@ -41,20 +42,34 @@ for url in urls:
         time.sleep(1)
         driver.find_element(By.XPATH, '//*[@id="total"]/a').click()
         time.sleep(1)
-        max_page = driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[7]/div[1]/div/a')[-1]\
-            .get_attribute('href').split('PageNumber=')[1].split('&')[0]
+        reviews = driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[7]/div[1]/div/a')[-1]\
+            .get_attribute('href')
+        max_page = reviews.split('PageNumber=')[1].split('&')[0]
         print(max_page)
-        long_reviews = driver.find_elements(By.CLASS_NAME, 'review_more')
-        for long_review in long_reviews:
-            try:
-                driver.execute_script('arguments[0].click();', long_review)
-                time.sleep(0.2)
-            except:
-                print('ElementClickInterceptedException')
-        reviews = driver.find_elements(By.CLASS_NAME, 'review_cont')
+        time.sleep(1)
+        review_driver.get(reviews)
+        review_pages = review_driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a')
+        review_pages[0].click()
+        time.sleep(1)
+        review_pages = review_driver.find_elements(By.XPATH, '//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a')
+        for ten_pages in range(int(max_page) // 10):
+            for i in range(3, 13):
+                reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
+                for review_cont in reviews:
+                    review = review + ' ' + review_cont.text
+                review_driver.find_element(By.XPATH, f'//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a[{i}]').click()
+                time.sleep(1)
+        reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
         for review_cont in reviews:
             review = review + ' ' + review_cont.text
-        time.sleep(1)
+        for i in range(3, int(max_page) % 10 + 2):
+            review_driver.find_element(By.XPATH,
+                                       f'//*[@id="infoset_reviewContentList"]/div[1]/div[1]/div/a[{i}]').click()
+            reviews = review_driver.find_elements(By.CSS_SELECTOR, '.reviewInfoBot.origin .review_cont')
+            for review_cont in reviews:
+                review = review + ' ' + review_cont.text
+            time.sleep(1)
+
     except NoSuchElementException:
         review = ''
     except:
