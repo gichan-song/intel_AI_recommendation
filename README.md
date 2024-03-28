@@ -4,4 +4,4 @@
 ![image](https://github.com/gichan-song/intel_AI_recommendation/assets/74893125/7304bd1e-0bc6-44a0-8ec9-ac8bc3618a77)
 ![image](https://github.com/gichan-song/intel_AI_recommendation/assets/74893125/8f88f92d-b5a2-4859-b58e-afe857cd0e90)
 ![image](https://github.com/gichan-song/intel_AI_recommendation/assets/74893125/ce396cdb-b750-4aa2-90a9-a69a9b4218a8)
-플레이 영상: <https://youtu.be/oNd8TsX4qVg>
+플레이 영상: <https://youtu.be/QDOwtVoaO5k>
